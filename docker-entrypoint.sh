@@ -88,6 +88,12 @@ if [ "$1" = 'postgres' ]; then
         echo 'PostgreSQL init process complete; ready for start up.'
         echo
     else
+        # internal start of server in order to allow set-up using psql-client       
+        # does not listen on TCP/IP and waits until start finishes
+        gosu postgres pg_ctl -D "$PGDATA" \
+            -o "-c listen_addresses=''" \
+            -w start
+
         # run these scripts every time the container starts
         echo
         for f in /docker-entrypoint-always.d/*; do
@@ -99,6 +105,12 @@ if [ "$1" = 'postgres' ]; then
             echo
         done
 
+        gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
+        set_listen_addresses '*'
+
+        echo
+        echo 'PostgreSQL init process complete; ready for start up.'
+        echo
     fi
 
     exec gosu postgres "$@"
