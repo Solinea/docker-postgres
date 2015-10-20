@@ -9,18 +9,25 @@ env:
 before_install:
   - gem install bundler
   - bundle install
-  - docker login -e="${DOCKER_EMAIL}" -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}" "${DOCKER_REGISTRY_COM}"
-  - docker pull "${DOCKER_REGISTRY_COM}"/"${NAME}":latest || true
+  - docker login -e="${HUB_EMAIL}" -u="${HUB_USERNAME}" -p="${HUB_PASSWORD}"
+  - docker pull solinea/"${NAME}":latest || true
 install:
   - docker build -t "${NAME}" .
 before_deploy:
-  - docker login -e="${DOCKER_EMAIL}" -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}" "${DOCKER_REGISTRY}"
-  - docker login -e="${DOCKER_EMAIL}" -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}" "${DOCKER_REGISTRY_DEV}"
+  - docker login -e="${DOCKER_EMAIL}" -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+    "${DOCKER_REGISTRY}"
+  - docker login -e="${DOCKER_EMAIL}" -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+    "${DOCKER_REGISTRY_DEV}"
 deploy:
   - provider: script
-    script: scripts/push-artifactory.sh
+    script: hack/bin/push-images-release
     on:
-      all_branches: true
+      tags: true
+  - provider: script
+    script: hack/bin/push-images-master
+    on:
+      branch: master
 notifications:
+  email: false
   slack:
-    secure: DtkaB63oWN9hYZ2MutTgMt9sqgoyvuFJrY9le00URuQB7Xr0HI0zBSKmUGm1spKx9Ta0QGiD2v211IZsvJtX+yNnIcA/sVQ5ss7rNa3VyGfsyyOtILkBrwtpwUbo2V424qgdW5CNS9j3vHOmmGAFJl0ceMNOgqi+z9izV3fqntHt8wMbAQw/m/GjpJzMTsPek2sMTmYKoN2A2W+ZnjjYxAupV+zy0/swbgPP0McK4RJG/LhMPrhZm3BSunNYUC6rL+XzEGV9nU58ULaUEFc+bQB5bpdAEfynOvosRJ2bMVh5PmZq3FyD85OTqvjuWYgDSLFGtLdphQrnHFblNSEf1/Ue3rpPY4tcywQpy2ocL+RHLypoD9Jw2RukTkgW0JeWuY10SquOFeKXh4qv7Fzxcd2iILh2Q6Hn08ikRIA5vaU5CVbaWc51OPh3D9+TTeeq8MqTbUvNhcLOvH8GjhxBDAR7DywVbNDzgNiekCXkbWJBpoeMOURnuuosJ9SPNKxmjz0EugCfin/pl6CfCUfpaRB1Mq3sTFFWtUYWx20l7U7KkBs+QlSILvTpkfw/CFj7tlcgWmlEhn6NBJ2+HFkQrndTCzcsvgQq3y8utcl4x6mQjRAnOoaN4zylra9qwDaGCg4DGf2kQDNIFZzAPBbvt0jK8fHebaU8/aaRkYAKAw8=
+    secure: qIRiEwkGWjsN/8w70HqORubk/vF6qx1kplp5Tj01GWRw/L8B15IuAUJ/L89QrnGaXB1NQgzucgbChZYNg8t0VlZbceQgPwlSL1gHuKerbbeJKkQW/xGgQgxmP7KgvuGESDtW0WhZXvsZ0JAgffI9wmud+EVHccoJ8rZoPSn5HjZacl8SXDb8JFashxAu7FfVngrkNV59LWwHYOljo+vsIQNX0UYDF6vgP1/ITTi8UWwoNPpNywJsgQyGylvGEIL50BxRgPxer/LPJnvYlYMidDaw6Uvh+nRjeVL2UEp2h6M19x5wqXLIh9y5EpkmKGh3PUatpR6x5b3xn92ROyqjKdykbRprkt2fuOyImcvt2zXPrkG7+RL6WXmFPVMZO8alDYREdCcg5W1EnTlxVCEMBDz1jBuSL9WkaCEiX6hGDikm1CXIcyrI4LgM3//VY3aFBqIrnkrUyrwD+1Ehl9/GQ9+nkoZNnAf5VgnGH7hW33fv9MxO+oaH6y9FjPg1oDQYzd8sfX3yJYIY468huXjkudosWDsHnT2sy2bjVXvw/2XDAWdPY0b427LRoC7KEvQIy1bfBt0nGPfNdbWt87ous2yjK709P5vZPUexTSAlOrED63nsf4BU2z+cLDMHrI48bTBD2OM5CE0RXnEp9Fd0I/+WvUAlywLFVhhfwPsSDrk=
