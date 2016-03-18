@@ -24,7 +24,7 @@
 FROM solinea/debian:jessie
 
 # explicitly set user/group IDs
-RUN groupadd -r postgres --gid=999 && useradd -r -g postgres --uid=999 postgres
+RUN groupadd -r postgres --gid=9010 && useradd -r -g postgres --uid=9010 postgres
 
 # grab gosu for easy step-down from root
 RUN gpg --keyserver pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
